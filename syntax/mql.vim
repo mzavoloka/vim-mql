@@ -1,19 +1,6 @@
-" Language:    MetaTrader Language: MQL
-" Maintainer:  Jônatas Davi Paganini <jonatasdp@gmail.com>
-" URL:         http://github.com/jonatasdp/vim-mql
-" License:     WTFPL
-" Inspired: Coffee Language
-
 if exists("b:current_syntax")
   finish
 endif
-
-if version < 600
-  syntax clear
-endif
-
-let b:current_syntax = "mql"
-
 
 syntax keyword mqlStatement return break continue
 highlight default link mqlStatement Statement
@@ -34,10 +21,10 @@ syntax keyword mqlKeyword new in of by where and or not is isnt
 \                            class extends super
 highlight default link mqlKeyword Keyword
 
-syntax keyword mqlBoolean true TRUE false FALSE EMPTY_VALUE EMPTY 
+syntax keyword mqlBoolean true TRUE false FALSE EMPTY_VALUE EMPTY
 highlight default link mqlBoolean Boolean
 
-syntax keyword mqlGlobal null NULL 
+syntax keyword mqlGlobal null NULL
 highlight default link mqlGlobal Type
 
 syntax keyword mqlVar this prototype arguments
@@ -120,14 +107,6 @@ syntax region mqlHeredoc start=/"""/ end=/"""/ contains=@mqlInterpString
 syntax region mqlHeredoc start=/'''/ end=/'''/ contains=@mqlSimpleString
 highlight default link mqlHeredoc String
 
-" Displays an error for trailing whitespace
-syntax match mqlSpaceError /\s\+$/ display
-highlight default link mqlSpaceError Error
-
-" Displays an error for trailing semicolons
-syntax match mqlSemicolonError /;$/ display
-highlight default link mqlSemicolonError Error
-
-" Displays an error for reserved words
-syntax keyword mqlReservedWords bool case default do function var void with const enum export import native extern input
+syntax keyword mqlReservedWords bool case default do function var with const enum
+\ export import native extern input color datetime double int string void
 highlight default link mqlReservedWords Identifier
