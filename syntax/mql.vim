@@ -63,10 +63,6 @@ highlight default link mqlFunction Function
 syntax keyword mqlTodo TODO FIXME XXX contained
 highlight default link mqlTodo Todo
 
-syntax match mqlComment /\/\/.*/ contains=@Spell,mqlTodo
-syntax match mqlComment /#.*/ contains=@Spell,mqlTodo
-highlight default link mqlComment Comment
-
 syntax region mqlEmbed start=/`/ end=/`/
 highlight default link mqlEmbed Special
 
@@ -110,3 +106,49 @@ highlight default link mqlHeredoc String
 syntax keyword mqlReservedWords bool case default do function var with const enum
 \ export import native extern input color datetime double int string void
 highlight default link mqlReservedWords Identifier
+
+
+"+-------------------------------------------------------------------+
+"| Comments                                                          |
+"+-------------------------------------------------------------------+
+
+" mql4CommentGroup allows adding matches for special things in comments
+syn cluster	mql4CommentGroup	contains=mql4Todo,mql4BadContinuation
+
+if exists("c_comment_strings")
+  " A comment can contain mql4String, mql4Character and mql4Number.
+  " But a "*/" inside a mql4String in a mql4Comment DOES end the comment!  So we
+  " need to use a special type of mql4String: mql4CommentString, which also ends on
+  " "*/", and sees a "*" at the start of the line as comment again.
+  " Unfortunately this doesn't very well work for // type of comments :-(
+  syntax match	mql4CommentSkip	contained "^\s*\*\($\|\s\+\)"
+  syntax region mql4CommentString	contained start=+L\=\\\@<!"+ skip=+\\\\\|\\"+ end=+"+ end=+\*/+me=s-1 contains=mql4Special,mql4CommentSkip
+  syntax region mql4Comment2String	contained start=+L\=\\\@<!"+ skip=+\\\\\|\\"+ end=+"+ end="$" contains=mql4Special
+  syntax region  mql4CommentL	start="//" skip="\\$" end="$" keepend contains=@mql4CommentGroup,mql4Comment2String,mql4Character,mql4NumbersCom,mql4SpaceError,@Spell
+  if exists("c_no_comment_fold")
+    " Use "extend" here to have preprocessor lines not terminate halfway a
+    " comment.
+    syntax region mql4Comment	matchgroup=mql4CommentStart start="/\*" end="\*/" contains=@mql4CommentGroup,mql4CommentStartError,mql4CommentString,mql4Character,mql4NumbersCom,mql4SpaceError,@Spell extend
+  else
+    syntax region mql4Comment	matchgroup=mql4CommentStart start="/\*" end="\*/" contains=@mql4CommentGroup,mql4CommentStartError,mql4CommentString,mql4Character,mql4NumbersCom,mql4SpaceError,@Spell fold extend
+  endif
+else
+  syn region	mql4CommentL	start="//" skip="\\$" end="$" keepend contains=@mql4CommentGroup,mql4SpaceError,@Spell
+  if exists("c_no_comment_fold")
+    syn region	mql4Comment	matchgroup=mql4CommentStart start="/\*" end="\*/" contains=@mql4CommentGroup,mql4CommentStartError,mql4SpaceError,@Spell extend
+  else
+    syn region	mql4Comment	matchgroup=mql4CommentStart start="/\*" end="\*/" contains=@mql4CommentGroup,mql4CommentStartError,mql4SpaceError,@Spell fold extend
+  endif
+endif
+" keep a // comment separately, it terminates a preproc. conditional
+syntax match	mql4CommentError	display "\*/"
+syntax match	mql4CommentStartError display "/\*"me=e-1 contained
+
+hi def link mql4Comment		Comment
+hi def link mql4CommentString	mql4String
+hi def link mql4Comment2String	mql4String
+hi def link mql4CommentSkip	mql4Comment
+hi def link mql4CommentError	mql4Error
+hi def link mql4CommentStartError	mql4Error
+hi def link mql4CommentL		mql4Comment
+hi def link mql4CommentStart	mql4Comment
